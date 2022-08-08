@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name        全条目中文化
+// @namespace   wullic
 // @author      Wullic
 // @version     0.1
 // @description Bangumi 全条目(Subjects)中文化
-// @author      Wullic
 // @include     /^https?://(bangumi\.tv|bgm\.tv)/?.*/
+// @updateURL   https://github.com/wullic/Bangumi-subjects-to-chinese/raw/master/Bangumi-subjects-to-chinese.user.js
 // ==/UserScript==
 
 // Data symbol
