@@ -45,16 +45,20 @@ function ajaxRequest(/*method, url, headers*/ ) {
   });
 }
 
-/* Important Const */
 const const_subject_alias = "subject";
 const const_subject_getApi = "https://api.bgm.tv/v0/subjects/";
 const const_subject_idRegex = /.*subject\/(\d+)$/i;
 
+const const_ep_alias = "ep";
+const const_ep_getApi = "https://api.bgm.tv/v0/episodes/";
+const const_ep_idRegex = /.*ep\/(\d+)$/i;
+
+var config_lang;
 
 class Item {
   constructor(id) {
     this.id = id;
-    this.name;
+    this.info ={};
   }
 
   get alias() {
@@ -66,40 +70,41 @@ class Item {
   }
 
   get key() {
-    return `${this.alias}/${this.id}`
+    return `${this.alias}/${this.id}`;
   }
 
-  async getName() {
+ async fetchNetData() {
+    return; /* Need Implementation */
+  }
+
+  async getInfo() {
     await this.updateData();
-    return this.name;
+    return this.info;
   }
 
   async updateData() {
     if (!await this.fetchItem()) {
-      if(await this.fetchNetData())
-	await this.writeItem();
+      await this.fetchNetData();
+      await this.writeItem();
     }
   }
 
   async fetchItem() {
-    this.name = window.localStorage.getItem(this.key);
-    return this.name;
+    let rel = window.localStorage.getItem(this.key);
+    if (rel){
+      this.info = JSON.parse(rel);
+      return true; // Succeed
+    }
+    return false; // Failed
   }
 
   async writeItem() {
-    window.localStorage.setItem(this.key, this.name);
+    if (Object.keys(this.info).length > 0)
+      window.localStorage.setItem(this.key, JSON.stringify(this.info));
   }
 
-  async deleteItem() {
+   async deleteItem() {
     window.localStorage.removeItem(this.key);
-  }
-
-  async fetchNetData() {
-    let url = this.getApi + this.id;
-    let data = await ajaxRequest("GET", url, {"accept": "application/json"});
-    data = JSON.parse(data);
-    this.name = data['name_cn'];
-    return this.name;
   }
 }
 
@@ -111,59 +116,56 @@ class SubjectItem extends Item {
   get getApi () {
     return const_subject_getApi; /* Need impletation */
   }
+
+  async fetchNetData() {
+    let url = this.getApi + this.id;
+    let data = await ajaxRequest("GET", url, {"accept": "application/json"});
+    data = JSON.parse(data);
+    if (data['name_cn']) { // Detect data whether have key "name_cn" : true or false
+      this.info.name_cn = data.name_cn;
+    }
+  }
+}
+
+class EpisodeItem extends Item {
+  get alias() {
+    return const_ep_alias ; /* Need implementation */
+  }
+
+  get getApi () {
+    return const_ep_getApi; /* Need implementation */
+  }
+
+  async fetchNetData() {
+    let url = this.getApi + this.id;
+    let data = await ajaxRequest("GET", url, {"accept": "application/json"});
+    data = JSON.parse(data);
+    if (data['name_cn']) {// Detect data whether have key "name_cn" : true or false
+      this.info.name_cn = data.name_cn;
+    }
+    if (data['ep']) {// Detect data whether have key "name_cn" : true or false
+      this.info.ep = data.ep;
+    }
+  }
+
 }
 
 class Boss {
-  constructor(re, staff) {
-    this.idRegEx = re;
-    this.staff = staff;
-    this.config_lang = "default";
+
+  get idRegex() {
+    return; /* Need Implementation */
   }
 
-  updateEleName(element, newName) {
-    if (!element || !newName) return null;
-    /* Case1 : <div id="subject_inner_info" ...> <a href="subject/xxxx"> <imag>NAME</a></div> */
-    /* Case2 : <a href="subject/xxxx" ...>NAME</a> */
+  get staff() {
+    return; /* Need Implementation */
+  }
 
-    /* Case3 : <a href="subject/xxx"> <small> [1/9] </small> <span>NAME</span></a> */
-    let childs = element.children;
-    let len = childs.length;
-    if (len <= 0) {
-      element.innerText = newName; // Case2
-    }
-    else if (len == 1 && childs[0].tagName.toLowerCase() == "img") { // Case1
-      element.innerHTML = childs[0].outerHTML + newName;
-    }
-    else { // Case 3
-      for (let i=0; i<len; ++i) {
-	if (childs[i].tagName.toLowerCase() == "span") {
-	  let cls = childs[i].getAttribute("class");
-	  if (cls) {
-	    if (cls == "name") childs[i].innerText = newName;
-	  }
-	  else {
-	    childs[i].innerText = newName;
-	  }
-	}
-      }
-    }
+  updateEleName(element, info) {
+    return; /* Need Implementation */
   }
 
   currentEleName(element) {
-    if (!element) return null;
-    let childs = element.children;
-    if (!childs.length) return element.innerText;
-    for (let i=0; i<childs.length; ++i) {
-      if (childs[i].tagName.toLowerCase() == "span") {
-	let cls = childs[i].getAttribute("class");
-	if (cls) {
-	  if (cls == "name") return childs[i].innerText;
-	}
-	else {
-	  return childs[i].innerText;
-	}
-      }
-    }
+    return; /* Need Implementation */
   }
 
   needUpdateName(element) {
@@ -179,18 +181,17 @@ class Boss {
       // console.log(`全为中文：${curName}`);
 	    return false;
     }
-
   }
 
   updateAllName() {
-    if (this.config_lang == "default") return;
+    if (config_lang == "default") return;
     document.querySelectorAll("a[href]").forEach((ele) => {
       let href = ele.getAttribute("href");
-      let match = href.match(this.idRegEx);
+      let match = href.match(this.idRegex);
       if (match && this.needUpdateName(ele)) {
 	let item = new this.staff(match[1]);
-	item.getName().then(newName => {
-	  this.updateEleName(ele, newName);
+	item.getInfo().then(info => {
+	  this.updateEleName(ele, info);
 	}).catch(e => {
 	  console.log(e);
 	});
@@ -199,15 +200,18 @@ class Boss {
   }
 
   createSwitcher() {
+    let rel = document.querySelector('#wullic_chinese');
+    if (rel) return;
     let logout = document.querySelector("#dock a[href*='/logout/']");
     if (logout) {
       let switcher = document.createElement("a");
-      switcher.href = '#';
-      let lang = this.config_lang;
+      switcher.id = "wullic_chinese";
+      switcher.href = '#'; // Set element url
+      let lang = config_lang;
       switcher.textContent = lang == "default" ? "默认" : "汉化";
       switcher.addEventListener("click", evt => {
-	lang = this.config_lang == "default" ? "cn" : "default";
-	location.href = location.href;
+	lang = config_lang == "default" ? "cn" : "default";
+	location.href = location.href; // Set url = current page url, to refresh page
 	window.localStorage.setItem("config_lang", lang);
       });
       logout.before(switcher, " | ");
@@ -217,7 +221,6 @@ class Boss {
   updateName() {
     this.createSwitcher();
     this.updateAllName();
-
     /* Detect change on DOM nodes */
     // @see https://stackoverflow.com/questions/3219758/detect-changes-in-the-dom
     // @see https://bangumi.tv/dev/app/258
@@ -233,10 +236,116 @@ class Boss {
   }
 }
 
+class SubjectBoss extends Boss {
+
+  get idRegex() {
+    return const_subject_idRegex;
+  }
+
+  get staff() {
+    return SubjectItem;
+  }
+
+  updateEleName(element, info) {
+    if (!element || !info || !info['name_cn']) return null;
+    /* Case1 : <a href="subject/xxxx" ...>NAME</a> */
+    /* Case2 : <div id="subject_inner_info" ...> <a href="subject/xxxx"> <imag>NAME</a></div> */
+    /* Case3 : <a href="subject/xxx"> <small> [1/9] </small> <span>NAME</span></a> */
+    let childs = element.children;
+    let len = childs.length;
+    if (len <= 0) {
+      element.innerText = info.name_cn; // Case1
+    }
+    else if (len == 1 && childs[0].tagName.toLowerCase() == "img") { // Case2
+      element.innerHTML = childs[0].outerHTML + info.name_cn;
+    }
+    else { // Case 3
+      for (let i=0; i<len; ++i) {
+	if (childs[i].tagName.toLowerCase() == "span") {
+	  let cls = childs[i].getAttribute("class");
+	  if (cls) {
+	    if (cls == "name") childs[i].innerText = info.name_cn;
+	  }
+	  else {
+	    childs[i].innerText = info.name_cn;
+	  }
+	}
+      }
+    }
+  }
+
+  currentEleName(element) {
+    /* Case1 : <a href="subject/xxxx" ...>NAME</a> */
+    /* Case2 : <div id="subject_inner_info" ...> <a href="subject/xxxx"> <imag>NAME</a></div> */
+    /* Case3 : <a href="subject/xxx"> <small> [1/9] </small> <span>NAME</span></a> */
+
+    if (!element) return null;
+    let childs = element.children;
+    if (!childs.length) return element.innerText; // Case1
+    for (let i=0; i<childs.length; ++i) {
+      if (childs[i].tagName.toLowerCase() == "span") {
+	let cls = childs[i].getAttribute("class");
+	if (cls) {
+	  if (cls == "name") return childs[i].innerText;
+	}
+	else {
+	  return childs[i].innerText;
+	}
+      }
+    }
+  }
+
+
+}
+
+class EpisodeBoss extends Boss {
+
+  get idRegex() {
+    return const_ep_idRegex;
+  }
+
+  get staff() {
+    return EpisodeItem;
+  }
+
+  updateEleName(element, info) {
+    if (!element || !info || !info['name_cn']) return null;
+    /* Case1 : <a>NAME</a> */
+    /* Case2 : <a><small></small>NAME</a> */
+    /* Case3 : <small><a>NAME</a></small> */
+    /* Case4 : "上一章节prev" 和 "下一章节next" */
+    let childs = element.children;
+    let parent = element.parentNode;
+    const EPNAME = `「ep. ${info.ep}」 ${info.name_cn}`;
+
+    if (childs.length <= 0) { // Case1 && Case3
+      let cls = element.getAttribute("class");
+      if (cls != "prev" && cls != "next"){ // Ignore Case4
+	element.innerText = (parent.tagName.toLowerCase() == "small") ? info.name_cn : EPNAME;
+      }
+    }
+    else if (childs.length == 1) { // Case2
+      element.innerHTML = childs[0].outerHTML + ' ' + info.name_cn;
+    }
+    else {
+      element.innerText = info.name_cn;
+    }
+  }
+
+  currentEleName(element) {
+    /* Case1 : <a href="subject/xxxx" ...>NAME</a> */
+    /* Case2 : <a href="subject/xxxx" ...><small></small>NAME</a> */
+    if (!element) return null;
+    return element.innerText;
+  }
+}
+
 function main () {
-  var subjectBoss = new Boss(const_subject_idRegex, SubjectItem);
-  subjectBoss.config_lang = window.localStorage.getItem("config_lang");
+  config_lang = window.localStorage.getItem("config_lang");
+  var subjectBoss = new SubjectBoss();
+  var epBoss = new EpisodeBoss();
   subjectBoss.updateName();
+  epBoss.updateName();
 }
 
 /* Detect document loaded state => document.readyState */
@@ -250,3 +359,6 @@ if (document.readyState == "interactive" || document.readyState == "complete") {
 else {
   window.addEventListener("DOMContentLoaded", main);
 }
+
+
+// Most debug time cost on spelling error, indicating that the significance of TypeScript and ESlint!
