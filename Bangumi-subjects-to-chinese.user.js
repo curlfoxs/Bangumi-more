@@ -6,6 +6,7 @@
 // @description Bangumi 全条目(Subjects)中文化
 // @include     /^https?://(bangumi\.tv|bgm\.tv)/?.*/
 // @updateURL   https://github.com/wullic/Bangumi-subjects-to-chinese/raw/master/Bangumi-subjects-to-chinese.user.js
+// @run-at      document-start
 // ==/UserScript==
 
 // Data symbol
@@ -168,33 +169,50 @@ class SubjectBoss {
 }
 
 /* Main flow*/
-var subj = new SubjectBoss();
-var config_lang = window.localStorage.getItem("config_lang");
+function main () {
+  var subj = new SubjectBoss();
+  var config_lang = window.localStorage.getItem("config_lang");
 
-function createSwitcher() {
-  let logout = $("#dock a[href*='/logout/']");
-  if (logout) {
-    let switcher = document.createElement("a");
-    switcher.href = '#';
-    let lang = config_lang;
-    switcher.textContent = lang == "default" ? "默认" : "汉化";
-    switcher.addEventListener("click", evt => {
-      config_lang = config_lang == "default" ? "cn" : "default";
-      location.href = location.href;
-      window.localStorage.setItem("config_lang", config_lang);
-    });
-    logout.before(switcher, " | ");
+  function createSwitcher() {
+    let logout = $("#dock a[href*='/logout/']");
+    if (logout) {
+      let switcher = document.createElement("a");
+      switcher.href = '#';
+      let lang = config_lang;
+      switcher.textContent = lang == "default" ? "默认" : "汉化";
+      switcher.addEventListener("click", evt => {
+	config_lang = config_lang == "default" ? "cn" : "default";
+	location.href = location.href;
+	window.localStorage.setItem("config_lang", config_lang);
+      });
+      logout.before(switcher, " | ");
+    }
   }
+
+  function updateName() {
+    if (config_lang != "default") subj.updateAllName();
+  }
+
+  createSwitcher();
+  updateName();
+
+  /* Response after click load more btn */
+  var loadBtn = document.querySelector("a[class='p loadmoreBtn']");
+  if(loadBtn){
+    loadBtn.addEventListener('click', function() {
+      setTimeout(updateName, 500);
+    });
+  }
+
 }
 
-function updateName() {
-  if (config_lang != "default") subj.updateAllName();
+// If the script run at document-idle or complete, just run main();
+// Detect if document has loaded?
+// @see https://stackoverflow.com/questions/978740/javascript-how-to-detect-if-document-has-loaded-ie-7-firefox-3
+if (document.readyState == "complete") {
+  main();
 }
-
-createSwitcher();
-$(document).ready(updateName);
-
-
-document.querySelector("a[class='p loadmoreBtn']").addEventListener('click', function() {
-  setTimeout(updateName, 500);
-});
+else {
+  // If the scirpt run at document-start, add EventListener call back function
+  window.addEventListener("DOMContentLoaded", main);
+}
