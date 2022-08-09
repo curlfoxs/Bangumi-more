@@ -1,15 +1,13 @@
 // ==UserScript==
-// @name        全条目中文化
+// @name        Bangumi 全条目中文化
 // @namespace   wullic
 // @author      Wullic
 // @version     0.1
 // @description Bangumi 全条目(Subjects)中文化
 // @include     /^https?://(bangumi\.tv|bgm\.tv)/?.*/
-// @updateURL   https://github.com/wullic/Bangumi-subjects-to-chinese/raw/master/Bangumi-subjects-to-chinese.user.js
-// @run-at      document-start
+// @icon        https://bgm.tv/img/favicon.ico
+// @run-at      document.start
 // ==/UserScript==
-
-// Data symbol
 
 function ajaxRequest(/*method, url, headers*/ ) {
   let method = arguments[0];
@@ -95,6 +93,7 @@ class SubjectItem {
 
 class SubjectBoss {
   idRegEx = /.*subject\/(\d+)$/i;
+  config_lang = "default";
 
   constructor() {
     this.staff = SubjectItem;
@@ -153,6 +152,7 @@ class SubjectBoss {
   }
 
   updateAllName() {
+    if (this.config_lang == "default") return;
     document.querySelectorAll("a[href]").forEach((ele) => {
       let href = ele.getAttribute("href");
       let match = href.match(this.idRegEx);
@@ -166,53 +166,56 @@ class SubjectBoss {
       }
     });
   }
-}
 
-/* Main flow*/
-function main () {
-  var subj = new SubjectBoss();
-  var config_lang = window.localStorage.getItem("config_lang");
-
-  function createSwitcher() {
+  createSwitcher() {
     let logout = $("#dock a[href*='/logout/']");
     if (logout) {
       let switcher = document.createElement("a");
       switcher.href = '#';
-      let lang = config_lang;
+      let lang = this.config_lang;
       switcher.textContent = lang == "default" ? "默认" : "汉化";
       switcher.addEventListener("click", evt => {
-	config_lang = config_lang == "default" ? "cn" : "default";
+	lang = this.config_lang == "default" ? "cn" : "default";
 	location.href = location.href;
-	window.localStorage.setItem("config_lang", config_lang);
+	window.localStorage.setItem("config_lang", lang);
       });
       logout.before(switcher, " | ");
     }
   }
 
-  function updateName() {
-    if (config_lang != "default") subj.updateAllName();
+  updateName() {
+    this.createSwitcher();
+    this.updateAllName();
+
+    /* Detect change on DOM nodes */
+    // @see https://stackoverflow.com/questions/3219758/detect-changes-in-the-dom
+    // @see https://bangumi.tv/dev/app/258
+    var tmlContent = document.querySelector("#tmlContent");
+    if (tmlContent) {
+      let observer = new MutationObserver(() => {
+	this.updateAllName();
+      });
+      observer.observe(tmlContent, {
+	childList: true,
+      });
+    }
   }
-
-  createSwitcher();
-  updateName();
-
-  /* Response after click load more btn */
-  var loadBtn = document.querySelector("a[class='p loadmoreBtn']");
-  if(loadBtn){
-    loadBtn.addEventListener('click', function() {
-      setTimeout(updateName, 500);
-    });
-  }
-
 }
 
-// If the script run at document-idle or complete, just run main();
-// Detect if document has loaded?
+function main () {
+  var subj = new SubjectBoss();
+  subj.config_lang = window.localStorage.getItem("config_lang");
+  subj.updateName();
+}
+
+/* Detect document loaded state => document.readyState */
 // @see https://stackoverflow.com/questions/978740/javascript-how-to-detect-if-document-has-loaded-ie-7-firefox-3
-if (document.readyState == "complete") {
+
+// @see https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState
+// State: "loading" "interactive" "complete"
+if (document.readyState == "interactive" || document.readyState == "complete") {
   main();
 }
 else {
-  // If the scirpt run at document-start, add EventListener call back function
   window.addEventListener("DOMContentLoaded", main);
 }
