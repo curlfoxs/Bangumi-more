@@ -9,6 +9,8 @@
 // @run-at      document.start
 // ==/UserScript==
 
+
+// AjaxRequest
 function ajaxRequest(/*method, url, headers*/ ) {
   let method = arguments[0];
   let url = arguments[1];
@@ -43,14 +45,24 @@ function ajaxRequest(/*method, url, headers*/ ) {
   });
 }
 
-class SubjectItem {
-  id;
-  name;
-  alias = "subject"
-  getApi = "https://api.bgm.tv/v0/subjects/";
+/* Important Const */
+const const_subject_alias = "subject";
+const const_subject_getApi = "https://api.bgm.tv/v0/subjects/";
+const const_subject_idRegex = /.*subject\/(\d+)$/i;
 
+
+class Item {
   constructor(id) {
     this.id = id;
+    this.name;
+  }
+
+  get alias() {
+    return; /* Need impletation */
+  }
+
+  get getApi () {
+    return; /* Need impletation */
   }
 
   get key() {
@@ -91,12 +103,21 @@ class SubjectItem {
   }
 }
 
-class SubjectBoss {
-  idRegEx = /.*subject\/(\d+)$/i;
-  config_lang = "default";
+class SubjectItem extends Item {
+  get alias() {
+    return const_subject_alias ; /* Need impletation */
+  }
 
-  constructor() {
-    this.staff = SubjectItem;
+  get getApi () {
+    return const_subject_getApi; /* Need impletation */
+  }
+}
+
+class Boss {
+  constructor(re, staff) {
+    this.idRegEx = re;
+    this.staff = staff;
+    this.config_lang = "default";
   }
 
   updateEleName(element, newName) {
@@ -213,9 +234,9 @@ class SubjectBoss {
 }
 
 function main () {
-  var subj = new SubjectBoss();
-  subj.config_lang = window.localStorage.getItem("config_lang");
-  subj.updateName();
+  var subjectBoss = new Boss(const_subject_idRegex, SubjectItem);
+  subjectBoss.config_lang = window.localStorage.getItem("config_lang");
+  subjectBoss.updateName();
 }
 
 /* Detect document loaded state => document.readyState */
