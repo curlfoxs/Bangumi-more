@@ -101,10 +101,20 @@ class SubjectBoss {
 
   updateEleName(element, newName) {
     if (!element || !newName) return null;
+    /* Case1 : <div id="subject_inner_info" ...> <a href="subject/xxxx"> <imag>NAME</a></div> */
+    /* Case2 : <a href="subject/xxxx" ...>NAME</a> */
+
+    /* Case3 : <a href="subject/xxx"> <small> [1/9] </small> <span>NAME</span></a> */
     let childs = element.children;
-    if (childs.length <= 0) element.innerText = newName;
-    else {
-      for (let i=0; i<childs.length; ++i) {
+    let len = childs.length;
+    if (len <= 0) {
+      element.innerText = newName; // Case2
+    }
+    else if (len == 1 && childs[0].tagName.toLowerCase() == "img") { // Case1
+      element.innerHTML = childs[0].outerHTML + newName;
+    }
+    else { // Case 3
+      for (let i=0; i<len; ++i) {
 	if (childs[i].tagName.toLowerCase() == "span") {
 	  let cls = childs[i].getAttribute("class");
 	  if (cls) {
@@ -168,7 +178,7 @@ class SubjectBoss {
   }
 
   createSwitcher() {
-    let logout = $("#dock a[href*='/logout/']");
+    let logout = document.querySelector("#dock a[href*='/logout/']");
     if (logout) {
       let switcher = document.createElement("a");
       switcher.href = '#';
