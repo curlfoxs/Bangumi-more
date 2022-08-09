@@ -167,15 +167,9 @@ class SubjectBoss {
   }
 }
 
-
-// Main flow
+/* Main flow*/
 var subj = new SubjectBoss();
 var config_lang = window.localStorage.getItem("config_lang");
-
-
-function updateName() {
-  subj.updateAllName();
-}
 
 function createSwitcher() {
   let logout = $("#dock a[href*='/logout/']");
@@ -193,5 +187,14 @@ function createSwitcher() {
   }
 }
 
+function updateName() {
+  if (config_lang != "default") subj.updateAllName();
+}
+
 createSwitcher();
-if (config_lang != "default") updateName();
+$(document).ready(updateName);
+
+
+document.querySelector("a[class='p loadmoreBtn']").addEventListener('click', function() {
+  setTimeout(updateName, 500);
+});
