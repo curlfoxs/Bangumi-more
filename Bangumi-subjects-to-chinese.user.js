@@ -1,13 +1,29 @@
 // ==UserScript==
-// @name        Bangumi 全条目中文化
+// @name        Bangumi 全条目 + 全章节中文化
 // @namespace   wullic
 // @author      Wullic
-// @version     0.1
-// @description Bangumi 全条目(Subjects)中文化
+// @version     0.2
+// @description Bangumi 全条目 + 全章节中文化
 // @include     /^https?://(bangumi\.tv|bgm\.tv)/?.*/
 // @icon        https://bgm.tv/img/favicon.ico
+// @grant       GM_info
 // @run-at      document.start
 // ==/UserScript==
+
+
+const const_subject_alias = "subject";
+const const_subject_getApi = "https://api.bgm.tv/v0/subjects/";
+const const_subject_idRegex = /.*subject\/(\d+)$/i;
+
+const const_ep_alias = "ep";
+const const_ep_getApi = "https://api.bgm.tv/v0/episodes/";
+const const_ep_idRegex = /.*ep\/(\d+)$/i;
+
+const const_version = "0.2";
+
+var config_lang;
+
+
 
 
 // AjaxRequest
@@ -45,15 +61,6 @@ function ajaxRequest(/*method, url, headers*/ ) {
   });
 }
 
-const const_subject_alias = "subject";
-const const_subject_getApi = "https://api.bgm.tv/v0/subjects/";
-const const_subject_idRegex = /.*subject\/(\d+)$/i;
-
-const const_ep_alias = "ep";
-const const_ep_getApi = "https://api.bgm.tv/v0/episodes/";
-const const_ep_idRegex = /.*ep\/(\d+)$/i;
-
-var config_lang;
 
 class Item {
   constructor(id) {
@@ -143,7 +150,7 @@ class EpisodeItem extends Item {
     if (data['name_cn']) {// Detect data whether have key "name_cn" : true or false
       this.info.name_cn = data.name_cn;
     }
-    if (data['ep']) {// Detect data whether have key "name_cn" : true or false
+    if (data['ep'] || data['ep'] == 0) {// Detect data whether have key "name_cn" : true or false
       this.info.ep = data.ep;
     }
   }
@@ -341,6 +348,14 @@ class EpisodeBoss extends Boss {
 }
 
 function main () {
+  // Greasemonkey script version
+  // @see https://stackoverflow.com/questions/9237228/greasemonkey-script-version-constant
+  var curVersion = const_version;
+  var usedVersion = window.localStorage.getItem("used_version");
+  if (usedVersion != curVersion) {
+    window.localStorage.clear();
+    window.localStorage.setItem("used_version", curVersion);
+  }
   config_lang = window.localStorage.getItem("config_lang");
   var subjectBoss = new SubjectBoss();
   var epBoss = new EpisodeBoss();
