@@ -191,7 +191,8 @@ class Boss {
   }
 
   updateAllName() {
-    if (config_lang == "default") return;
+    if (config_lang == "default") return; // 「默认」语言 直接返回
+    if(location.pathname.match(RegExp("\/subject\/\\d+\/ep"))) return; // 「章节列表」页面不汉化
     document.querySelectorAll("a[href]").forEach((ele) => {
       let href = ele.getAttribute("href");
       let match = href.match(this.idRegex);
