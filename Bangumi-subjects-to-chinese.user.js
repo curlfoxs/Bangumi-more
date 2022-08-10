@@ -90,13 +90,13 @@ class Item {
   }
 
   async updateData() {
-    if (!await this.fetchItem()) {
+    if (! this.fetchItem()) {
       await this.fetchNetData();
-      await this.writeItem();
+      this.writeItem();
     }
   }
 
-  async fetchItem() {
+  fetchItem() {
     let rel = window.localStorage.getItem(this.key);
     if (rel){
       this.info = JSON.parse(rel);
@@ -105,7 +105,7 @@ class Item {
     return false; // Failed
   }
 
-  async writeItem() {
+  writeItem() {
     if (Object.keys(this.info).length > 0) {
       // Handle storage exceed error
       // @see https://chrisberkhout.com/blog/localstorage-errors/
@@ -119,7 +119,7 @@ class Item {
     }
   }
 
-   async deleteItem() {
+   deleteItem() {
     window.localStorage.removeItem(this.key);
   }
 }
@@ -135,9 +135,8 @@ class SubjectItem extends Item {
 
   async fetchNetData() {
     let url = this.getApi + this.id;
-    let data = await ajaxRequest("GET", url, {"accept": "application/json"});
-    data = JSON.parse(data);
-    if (data['name_cn']) { // Detect data whether have key "name_cn" : true or false
+    let data = JSON.parse(await ajaxRequest("GET", url, {"accept": "application/json"}));
+    if (data.name_cn) { // Detect data whether have key "name_cn" : true or false
       this.info.name_cn = data.name_cn;
     }
   }
@@ -154,16 +153,14 @@ class EpisodeItem extends Item {
 
   async fetchNetData() {
     let url = this.getApi + this.id;
-    let data = await ajaxRequest("GET", url, {"accept": "application/json"});
-    data = JSON.parse(data);
-    if (data['name_cn']) {// Detect data whether have key "name_cn" : true or false
+    let data = JSON.parse(await ajaxRequest("GET", url, {"accept": "application/json"}));
+    if (data.name_cn) {// Detect data whether have key "name_cn" : true or false
       this.info.name_cn = data.name_cn;
     }
-    if (data['ep'] || data['ep'] == 0) {// Detect data whether have key "name_cn" : true or false
+    if (data.ep || data.ep == 0) {// Detect data whether have key "name_cn" : true or false
       this.info.ep = data.ep;
     }
   }
-
 }
 
 class Boss {
@@ -185,40 +182,34 @@ class Boss {
   }
 
   needUpdateName(element) {
-    let curName = this.currentEleName(element);
-    if (!curName) return false; // Invalid
-    curName = curName.replaceAll(/\s/g, '');
-    let re = /[^0-9\u4e00-\u9fa5]/;
-    if (re.test(curName)) {// not all chinese
-      // console.log(`不全为中文：${curName}`);
-      return true;
-    }
-    else{// all Chinese
-      // console.log(`全为中文：${curName}`);
-	    return false;
+    try {
+      let re = /[^0-9\u4e00-\u9fa5]/;
+      let rel = re.test(this.currentEleName(element).replaceAll(/\s/g, ''));
+      return rel ? true : false;
+    } catch (TypeError) {
+      return false;
     }
   }
 
   updateAllName() {
     if (config_lang == "default") return; // 「默认」语言 直接返回
-    if(location.pathname.match(RegExp("\/subject\/\\d+\/ep"))) return; // 「章节列表」页面不汉化
-    document.querySelectorAll("a[href]").forEach((ele) => {
-      let href = ele.getAttribute("href");
-      let match = href.match(this.idRegex);
+    if (location.pathname.match(RegExp("\/subject\/\\d+\/ep"))) return; // 「章节列表」页面不汉化
+
+    Array.from(document.querySelectorAll("a[href]")).map(ele => {
+      let match =  ele.href.match(this.idRegex);
       if (match && this.needUpdateName(ele)) {
-	let item = new this.staff(match[1]);
-	item.getInfo().then(info => {
-	  this.updateEleName(ele, info);
-	}).catch(e => {
-	  console.log(e);
-	});
+        let item = new this.staff(match[1]);
+        item.getInfo().then(info => {
+          this.updateEleName(ele, info);
+        }).catch(e => {
+          console.log(e);
+        });
       }
     });
   }
 
   createSwitcher() {
-    let rel = document.querySelector('#wullic_chinese');
-    if (rel) return;
+    if (document.querySelector('#wullic_chinese')) return;
     let logout = document.querySelector("#dock a[href*='/logout/']");
     if (logout) {
       let switcher = document.createElement("a");
@@ -228,8 +219,8 @@ class Boss {
       switcher.textContent = lang == "default" ? "默认" : "汉化";
       switcher.addEventListener("click", evt => {
 	lang = config_lang == "default" ? "cn" : "default";
-	location.href = location.href; // Set url = current page url, to refresh page
 	window.localStorage.setItem("config_lang", lang);
+	location.href = location.href; // Set url = current page url, to refresh page
       });
       logout.before(switcher, " | ");
     }
@@ -264,7 +255,7 @@ class SubjectBoss extends Boss {
   }
 
   updateEleName(element, info) {
-    if (!element || !info || !info['name_cn']) return null;
+    if (!element || !info || !info['name_cn']) return;
     /* Case1 : <a href="subject/xxxx" ...>NAME</a> */
     /* Case2 : <div id="subject_inner_info" ...> <a href="subject/xxxx"> <imag>NAME</a></div> */
     /* Case3 : <a href="subject/xxx"> <small> [1/9] </small> <span>NAME</span></a> */
@@ -296,7 +287,7 @@ class SubjectBoss extends Boss {
     /* Case2 : <div id="subject_inner_info" ...> <a href="subject/xxxx"> <imag>NAME</a></div> */
     /* Case3 : <a href="subject/xxx"> <small> [1/9] </small> <span>NAME</span></a> */
 
-    if (!element) return null;
+    if (!element) return;
     let childs = element.children;
     if (!childs.length) return element.innerText; // Case1
     for (let i=0; i<childs.length; ++i) {
@@ -326,7 +317,7 @@ class EpisodeBoss extends Boss {
   }
 
   updateEleName(element, info) {
-    if (!element || !info || !info['name_cn']) return null;
+    if (!element || !info || !info['name_cn']) return;
     /* Case1 : <a>NAME</a> */
     /* Case2 : <a><small></small>NAME</a> */
     /* Case3 : <small><a>NAME</a></small> */
@@ -352,7 +343,7 @@ class EpisodeBoss extends Boss {
   currentEleName(element) {
     /* Case1 : <a href="subject/xxxx" ...>NAME</a> */
     /* Case2 : <a href="subject/xxxx" ...><small></small>NAME</a> */
-    if (!element) return null;
+    if (!element) return;
     return element.innerText;
   }
 }
@@ -360,12 +351,12 @@ class EpisodeBoss extends Boss {
 function main () {
   // Greasemonkey script version
   // @see https://stackoverflow.com/questions/9237228/greasemonkey-script-version-constant
-  var curVersion = const_version;
   var usedVersion = window.localStorage.getItem("used_version");
-  if (usedVersion != curVersion) {
+  if (usedVersion != const_version) {
     window.localStorage.clear();
-    window.localStorage.setItem("used_version", curVersion);
+    window.localStorage.setItem("used_version", const_version);
   }
+
   config_lang = window.localStorage.getItem("config_lang");
   var subjectBoss = new SubjectBoss();
   var epBoss = new EpisodeBoss();
