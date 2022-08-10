@@ -106,8 +106,17 @@ class Item {
   }
 
   async writeItem() {
-    if (Object.keys(this.info).length > 0)
-      window.localStorage.setItem(this.key, JSON.stringify(this.info));
+    if (Object.keys(this.info).length > 0) {
+      // Handle storage exceed error
+      // @see https://chrisberkhout.com/blog/localstorage-errors/
+      try {
+	window.localStorage.setItem(this.key, JSON.stringify(this.info));
+      } catch (e) {
+	if (e == QUOTA_EXCEEDED_ERR) {
+	  window.localStorage.clear(); //data wasn't successfully saved due to quota exceed so throw an error
+	}
+      }
+    }
   }
 
    async deleteItem() {
