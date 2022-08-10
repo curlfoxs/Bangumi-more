@@ -9,6 +9,9 @@
 // @run-at      document.start
 // ==/UserScript==
 
+const_version = "0.1";
+
+
 function ajaxRequest(/*method, url, headers*/ ) {
   let method = arguments[0];
   let url = arguments[1];
@@ -213,6 +216,13 @@ class SubjectBoss {
 }
 
 function main () {
+  var curVersion = const_version;
+  var usedVersion = window.localStorage.getItem("used_version");
+  if (usedVersion != curVersion) {
+    window.localStorage.clear();
+    window.localStorage.setItem("used_version", curVersion);
+  }
+
   var subj = new SubjectBoss();
   subj.config_lang = window.localStorage.getItem("config_lang");
   subj.updateName();
