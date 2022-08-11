@@ -95,7 +95,7 @@ class SubjectItem {
 }
 
 class SubjectBoss {
-  idRegEx = /.*subject\/(\d+)$/i;
+  idRegEx = /(?<!topic)\/subject\/(\d+)$/i;
   config_lang = "default";
 
   constructor() {
