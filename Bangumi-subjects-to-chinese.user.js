@@ -10,10 +10,12 @@
 // @run-at      document.start
 // ==/UserScript==
 
+// 需要过滤掉: <a href="/rakuen/topic/subject/22505" class="title avatar l" target="right">莉可丽丝的讨论</a>
+// 需要过滤掉: <a href="/rakuen/topic/subject/19876" class="title avatar l" target="right">CLANNED的讨论</a>
 
 const const_subject_alias = "subject";
 const const_subject_getApi = "https://api.bgm.tv/v0/subjects/";
-const const_subject_idRegex = /.*subject\/(\d+)$/i;
+const const_subject_idRegex = /(?<!topic)\/subject\/(\d+)$/i;
 
 const const_ep_alias = "ep";
 const const_ep_getApi = "https://api.bgm.tv/v0/episodes/";
