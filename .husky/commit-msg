@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Function to display commands
+exe() { echo "\$ ${@/eval/}" ; "$@" ; }
+
+echo "----------------------------------------------"
+exe npm run lint-check
+
+echo -e "\n\n----------------------------------------------"
+exe npx --no -- commitlint --edit $1

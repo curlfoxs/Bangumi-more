@@ -7,11 +7,15 @@
   "author": "wullic <godlight4u@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "check": "eslint . --ignore-path .gitignore",  
-    "prebuild": "eslint . --ignore-path .gitignore --quiet --fix \"src/**/*.@(js|ts)\"",
-    "build": "tsc -p ."
+    "lint-check": "eslint . --ignore-path .gitignore --quiet",
+    "lint": "eslint . --ignore-path .gitignore --quiet --fix \"src/**/*.@(js|ts)\"",
+    "prebuild": "npm run lint",
+    "build": "tsc -p .",
+    "prepare": "husky install"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.0.3",
+    "@commitlint/config-angular": "^17.0.3",
     "@tsconfig/node16": "^1.0.3",
     "@types/node": "^18.7.3",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
@@ -23,6 +27,7 @@
     "eslint-plugin-n": "^15.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-react": "^7.30.1",
+    "husky": "^8.0.0",
     "typescript": "^4.7.4"
   }
 }
