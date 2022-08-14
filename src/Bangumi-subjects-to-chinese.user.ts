@@ -10,8 +10,6 @@
 // @run-at      document.start
 // ==/UserScript==
 
-// How to use Record<T, T> type
-// @see https://www.typescriptlang.org/docs/handbook/utility-types.html#recordkt
 function ajaxRequest (method: "GET" | "POST", url: string,
     headers: Record<string, string>): Promise<any> {
     /**
@@ -49,8 +47,6 @@ const constVersion = "0.2";
 let configLang: null | string;
 
 /* Options of subjects, ep, topics, groups, users, etc. */
-// Dynamic keys
-// @see https://stackoverflow.com/questions/70114996/typescript-dictionary-with-dynamic-keys
 type ItemInfo = {
     [key: string]: string
 }
@@ -64,8 +60,8 @@ interface Options {
 const subjectOptions: Options = {
     category: "subjects",
     getApi: "https://api.bgm.tv/v0/subjects/",
-    // 需要过滤掉: <a href="/rakuen/topic/subject/22505" class="title avatar l" target="right">莉可丽丝的讨论</a>
-    // 需要过滤掉: <a href="/rakuen/topic/subject/19876" class="title avatar l" target="right">CLANNED的讨论</a>
+    // 需要过滤掉: <a href="/rakuen/topic/subject/22505">莉可丽丝的讨论</a>
+    // 需要过滤掉: <a href="/rakuen/topic/subject/19876">CLANNED的讨论</a>
     idRegex: /(?<!topic)\/subject\/(\d+)$/i
 };
 
@@ -75,9 +71,6 @@ const epOptions: Options = {
     idRegex: /.*ep\/(\d+)$/i
 };
 
-// Modifiers: public, private, protected
-// @see https://www.typescriptlang.org/docs/handbook/classes.html
-// Keyword: abstract
 abstract class ItemModel {
     id: string;
     info: ItemInfo;
@@ -117,7 +110,7 @@ abstract class ItemModel {
 
     protected store () {
         if (Object.keys(this.info).length > 0) {
-            // Handle storage exceed error
+            // Handle - localStorage exceed error
             // @see https://chrisberkhout.com/blog/localstorage-errors/
             try {
                 window.localStorage.setItem(this.uniqueKey, JSON.stringify(this.info));
@@ -163,19 +156,12 @@ class EpisodeItem extends ItemModel {
     }
 }
 
-// --------------------------------------------------------------------
-// For symbol, you would use simple type/interface to annotation the super frame/blueprit/symbol with env.
-// The basic and the most important is the env/frame go downs! This concept includes recursion's native.
-// For symbol collections, you would use <T> to annotation element
-// --------------------------------------------------------------------
-// Python type()??
 // @see https://stackoverflow.com/questions/12802317/passing-class-as-parameter-causes-is-not-newable-error
-// In case you use Angular, they have implemented Type, its similar to the Meirion Hughes answer:
+// Pass class as parameters , or Return as function return value
+// In case you use Angular, they have implemented Type
 type Type<T> = { new (...args: any[]): T; };
 
 abstract class Controler<T extends {getInfo: () => Promise<ItemInfo>}> {
-    // More advanced: Pass class as parameters , or as function return value
-    // @see https://stackoverflow.com/questions/12802317/passing-class-as-parameter-causes-is-not-newable-error
     protected abstract get Model(): Type<T>;
     // protected abstract get model(): new() => T; /* Need Implementation */
 
@@ -201,7 +187,7 @@ abstract class Controler<T extends {getInfo: () => Promise<ItemInfo>}> {
     protected updateAllName () {
         if (configLang == "default") return; // 「默认」语言 直接返回
         const re = /\/subject\/\\d+\/ep/i;
-        if (location.pathname.match(re)) return; // 「章节列表」页面不汉化
+        if (location.pathname.match(re)) return; // Fix - 「章节列表」页面不汉化
 
         // Default querySelectorAll(): NodeList<Element>
         document.querySelectorAll<HTMLAnchorElement>("a[href]").forEach(ele => {
@@ -353,7 +339,7 @@ class EpisodeControler extends Controler<EpisodeItem> {
 }
 
 function run () {
-    // Greasemonkey script version
+    // How to detect Greasemonkey script version
     // @see https://stackoverflow.com/questions/9237228/greasemonkey-script-version-constant
     const usedVersion = window.localStorage.getItem("used_version");
     if (usedVersion != constVersion) {
@@ -368,22 +354,12 @@ function run () {
     epControler.updateName();
 }
 
-/* Detect document loaded state => document.readyState */
+/* How to detect document loaded state ? */
+/* document.readyState ("loading" "interactive" "complete") */
 // @see https://stackoverflow.com/questions/978740/javascript-how-to-detect-if-document-has-loaded-ie-7-firefox-3
-
 // @see https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState
-// State: "loading" "interactive" "complete"
 if (document.readyState == "interactive" || document.readyState == "complete") {
     run();
 } else {
     window.addEventListener("DOMContentLoaded", run);
 }
-
-// Most debug time cost on spelling error, indicating that the significance of TypeScript and ESlint!
-
-// !Accessors are only available when targeting ECMAScript 5 and higher.
-// @see https://stackoverflow.com/questions/41010780/accessors-are-only-available-when-targeting-ecmascript-5-and-higher
-// @see https://stackoverflow.com/questions/41336301/typescript-cannot-find-name-window-or-document
-
-// How to complie, and which config to use
-// @see https://stackoverflow.com/questions/51024947/typescript-error-error-ts2705-an-async-function-or-method-in-es5-es3-requires
