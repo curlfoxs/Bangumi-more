@@ -10,6 +10,6 @@
 // @run-at      document.start
 // ==/UserScript==
 
-import { previewRun } from "#/modules/editor/bbcode-previe";
+import { previewRun } from "#/modules/editor/bbcode-preview";
 
 window.addEventListener("DOMContentLoaded", previewRun);

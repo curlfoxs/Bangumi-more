@@ -14,7 +14,6 @@
       "target": "ESNext",
       "noImplicitAny": false,
       "sourceMap": true,
-      "noEmit": true,
       "baseUrl": ".",
       "paths": {
         "@/*": ["src/*"],

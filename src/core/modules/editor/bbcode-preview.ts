@@ -1,15 +1,3 @@
-// ==UserScript==
-// @name        Bangumi 全条目 + 全章节中文化
-// @namespace   wullic
-// @author      Wullic
-// @version     0.2
-// @description Bangumi 全条目 + 全章节中文化
-// @include     /^https?://(bangumi\.tv|bgm\.tv)/?.*/
-// @icon        https://bgm.tv/img/favicon.ico
-// @grant       GM_info
-// @run-at      document.start
-// ==/UserScript==
-
 import { transform, MarkLang } from "./outlined";
 
 function previewRun () {
@@ -51,4 +39,4 @@ function previewRun () {
     }
 }
 
-window.addEventListener("DOMContentLoaded", previewRun);
+export { previewRun };

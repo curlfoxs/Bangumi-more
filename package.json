@@ -2,7 +2,7 @@
   "name": "bangumi-more",
   "version": "0.0.1",
   "description": "番组计划增强脚本",
-  "main": "index.js",
+  "main": "src/app.ts",
   "repository": "git@github.com:wullic/Bangumi-more.git",
   "author": "wullic <godlight4u@gmail.com>",
   "license": "MIT",
