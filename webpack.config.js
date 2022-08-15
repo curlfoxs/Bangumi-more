@@ -1,12 +1,13 @@
 var path = require('path');
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
     // Change to your "entry-point".
     entry: './src/index.ts', // The entry field tells Webpack where to start looking for modules to bundle
-    watch: true,
+    // watch: true,
     output: {
         path: path.resolve(__dirname, 'dist'),
-        filename: 'bangumi-bbcode-preview.bundle.user.js'
+        filename: 'bangumi-more.bundle.user.js'
     },
     resolve: { // The resolve.extensions field tells Webpack what file types to look for in which order during module resolution.
         extensions: ['.ts', '.tsx', '.js', '.json']
@@ -32,5 +33,18 @@ module.exports = {
             serverSideRender: true,
             writeToDisk: true,
         },
+    },
+    optimization: {
+        // minimize: true,
+        minimizer: [
+          new TerserPlugin({
+            extractComments: false, // 分离注释到单独一个文件夹
+            terserOptions: {
+                output: {
+                    comments: /==\/?UserScript==|^[ ]?@|eslint-disable|spell-checker/i,
+                },
+            },
+          }),
+        ],
     },
 };

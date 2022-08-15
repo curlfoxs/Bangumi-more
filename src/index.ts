@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name        Bangumi 全条目 + 全章节中文化
+// @name        Bangumi BBCode Preview
 // @namespace   wullic
 // @author      Wullic
-// @version     0.2
-// @description Bangumi 全条目 + 全章节中文化
+// @version     0.1
+// @description Bangumi BBCode Preview, 在Textarea编辑器里提供预览选项
 // @include     /^https?://(bangumi\.tv|bgm\.tv)/?.*/
 // @icon        https://bgm.tv/img/favicon.ico
 // @grant       GM_info
