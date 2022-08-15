@@ -7,9 +7,9 @@
 // @include     /^https?://(bangumi\.tv|bgm\.tv)/?.*/
 // @icon        https://bgm.tv/img/favicon.ico
 // @grant       GM_info
-// @run-at      document.start
+// @run-at      document.idle
 // ==/UserScript==
 
 import { previewRun } from "#/modules/editor/bbcode-preview";
 
-window.addEventListener("DOMContentLoaded", previewRun);
+setTimeout(previewRun, 500);

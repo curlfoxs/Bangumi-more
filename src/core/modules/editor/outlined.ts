@@ -1,4 +1,4 @@
-import { bbcodeParser } from "@/lib/bbcodeParser";
+import { BbcodeParser } from "@/lib/bbcodeParser";
 
 enum MarkLang {
     BB = "bbcode",
@@ -7,11 +7,15 @@ enum MarkLang {
 }
 
 function transform (src: string, from: MarkLang, to: MarkLang): undefined | string {
+    if (src.length == 0) {
+        return "";
+    }
     switch (from) {
         case MarkLang.BB: {
             switch (to) {
                 case MarkLang.HTML:{
-                    return bbcodeParser.bbcodeToHtml(src);
+                    const parser = new BbcodeParser();
+                    return parser.bbcodeToHtml(src);
                     break;
                 }
             }

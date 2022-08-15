@@ -1,7 +1,6 @@
 import { transform, MarkLang } from "./outlined";
 
 function previewRun () {
-    let preview = false;
     const mkHeader = document.querySelector(".markItUpHeader") as HTMLElement;
     const mkTextarea = document.querySelector("textarea[name='content']") as HTMLTextAreaElement;
     if (mkHeader && mkTextarea) {
@@ -21,19 +20,15 @@ function previewRun () {
         (mkHeader.firstChild as HTMLElement).append(s, previewBtn);
         previewBtn.onclick = () => { return false; };
         previewBtn.addEventListener("click", evt => {
-            if (preview == false) {
+            if (mkTextarea.style.display != "none") {
                 const src = mkTextarea.value;
                 const dest = transform(src, MarkLang.BB, MarkLang.HTML);
-                if (dest) {
-                    div.innerHTML = dest.trim();
-                }
+                div.innerHTML = dest.trim();
                 mkTextarea.style.display = "none";
                 div.style.display = "block";
-                preview = true;
             } else {
                 mkTextarea.style.display = "block";
                 div.style.display = "none";
-                preview = false;
             }
         });
     }
