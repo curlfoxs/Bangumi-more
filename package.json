@@ -9,7 +9,6 @@
   "scripts": {
     "lint-check": "eslint . --ignore-path .gitignore --quiet",
     "lint": "eslint . --ignore-path .gitignore --quiet --fix \"src/**/*.@(js|ts)\"",
-    "prebuild": "npm run lint",
     "build": "tsc -p .",
     "prepare": "husky install"
   },

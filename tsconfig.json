@@ -18,12 +18,14 @@
       "baseUrl": ".",
       "paths": {
         "@/*": ["src/*"],
+        "#/*": ["src/core/*"]
       },
       "outDir": "./build"
     },
     "include": ["./src/**/*"],
     "exclude": [
       "node_modules",
+      "tmp/*"
     ]
 }
   
