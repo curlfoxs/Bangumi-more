@@ -161,23 +161,22 @@ function BBCodeHTML() {
           str += splices[j] + quoteMatches[j];
         }
         if (j < splices.length) {str += splices[j];}
-      }
+      } 
 
       /**
        * Fit smiles emotion for bangumi.tv, just replace
        */
-      // let smileRe = /\(bgm[0-9]+\)/g;
-      // let smileMatch = str.match(re);
-      // if (smileMatch) {
-      //   for (let i=0; i<smileMatch.length; ++i) {
-      //     let smileIdx = Number(smileMatch[i].slice(3));
-      //     if (smileIdx >= 10 && smileIdx <= 123) {
-      //       str = str.replace(smileRe, `<img src="${smiles[smileMatch[i]]}" alt="${smileMatch[i]}">`);
-      //     }
-
-      //   }
-      // }
-      return str;
+      let smileRe = /\(bgm[0-9]+\)/g;
+      let smileMatch = str.match(smileRe);
+      if (smileMatch) {
+        for (let i=0; i<smileMatch.length; ++i) {
+          let smileIdx = Number(smileMatch[i].slice(4, -1));
+          if (smileIdx >= 10 && smileIdx <= 123) {
+            str = str.replace(smileMatch[i], s => `<img src="${smiles[s]}" alt"${s}">`);
+          }
+        }
+      }
+      return  str;
     };
 
     /**
