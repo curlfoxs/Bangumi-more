@@ -21,7 +21,7 @@
     "react",
     "@typescript-eslint"
   ],
-  "ignorePatterns": ["build/*", "*config.*", ".eslintrc.*", "src/lib/*", "tmp/*"],
+  "ignorePatterns": ["build/*", "dist/*", "src/lib/*", "tmp/*", "*config.*"],
   "rules": {
     "prefer-const": "error",
     "block-scoped-var": "warn",
