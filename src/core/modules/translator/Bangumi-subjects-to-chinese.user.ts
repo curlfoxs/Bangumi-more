@@ -338,7 +338,7 @@ class EpisodeControler extends Controler<EpisodeItem> {
     }
 }
 
-function run () {
+function translatorRun () {
     // How to detect Greasemonkey script version
     // @see https://stackoverflow.com/questions/9237228/greasemonkey-script-version-constant
     const usedVersion = window.localStorage.getItem("used_version");
@@ -359,7 +359,9 @@ function run () {
 // @see https://stackoverflow.com/questions/978740/javascript-how-to-detect-if-document-has-loaded-ie-7-firefox-3
 // @see https://developer.mozilla.org/en-US/docs/Web/API/Document/readyState
 if (document.readyState == "interactive" || document.readyState == "complete") {
-    run();
+    translatorRun();
 } else {
-    window.addEventListener("DOMContentLoaded", run);
+    window.addEventListener("DOMContentLoaded", translatorRun);
 }
+
+export { translatorRun };

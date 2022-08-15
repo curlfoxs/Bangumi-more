@@ -6,33 +6,33 @@ function previewRun () {
     const mkTextarea = document.querySelector("textarea[name='content']") as HTMLTextAreaElement;
     if (mkHeader && mkTextarea) {
         const s = document.createElement("li");
-        const a = document.createElement("a");
         const previewBtn = document.createElement("li");
+        const a = document.createElement("a");
         const div = document.createElement("div");
-        div.setAttribute("type", "hidden");
+        div.style.display = "none";
+        mkTextarea.after(div);
 
         s.setAttribute("class", "markItUpSeparator");
         s.textContent = "---------------";
         a.href = "";
         a.textContent = "预览";
         previewBtn.append(a);
-        mkHeader.append(s, previewBtn);
-        div.setAttribute("type", "hidden");
-        mkTextarea.after(div);
-
+        previewBtn.setAttribute("class", "markItUpButton markItUpButton15 preview");
+        (mkHeader.firstChild as HTMLElement).append(s, previewBtn);
+        previewBtn.onclick = () => { return false; };
         previewBtn.addEventListener("click", evt => {
             if (preview == false) {
-                mkTextarea.setAttribute("type", "hidden");
                 const src = mkTextarea.value;
                 const dest = transform(src, MarkLang.BB, MarkLang.HTML);
                 if (dest) {
                     div.innerHTML = dest.trim();
                 }
-                div.removeAttribute("type");
+                mkTextarea.style.display = "none";
+                div.style.display = "block";
                 preview = true;
             } else {
-                div.setAttribute("type", "hidden");
-                mkTextarea.removeAttribute("type");
+                mkTextarea.style.display = "block";
+                div.style.display = "none";
                 preview = false;
             }
         });

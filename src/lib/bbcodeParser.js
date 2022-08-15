@@ -1,6 +1,6 @@
 // @see https://coursesweb.net/javascript/convert-bbcode-html-javascript_cs
 // JS function to convert BBCode and HTML code - http;//coursesweb.net/javascript/
-var BBCodeHTML = function() {
+function BBCodeHTML() {
     var me = this;            // stores the object instance
     var token_match = /{[A-Z_]+[0-9]*}/ig;
 
@@ -200,4 +200,5 @@ var BBCodeHTML = function() {
     me.addBBCode('[mask]{TEXT}[/mask]', '<span style="background-color:#555;color:#555;border:1px solid #555;">{TEXT}</span>');
   };
 
-export const bbcodeParser = new BBCodeHTML();       // creates object instance of BBCodeHTML()
+
+export const bbcodeParser = new bbcodeParser();        // creates object instance of BBCodeHTML()
