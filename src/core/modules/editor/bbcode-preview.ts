@@ -1,12 +1,14 @@
 import { text } from "stream/consumers";
 import { transform, MarkLang } from "./outlined";
 
+const EDITTOOL_INIT_DELAY = 300;
+
 function previewRun () {
     const l = document.querySelector("#comment_list");
     l?.addEventListener("click", function f (evt: Event) {
         const textarea = (evt.currentTarget as HTMLElement).querySelector("textarea.sub_reply");
         if (textarea && textarea == evt.target && textarea.nextElementSibling.hasAttribute("class")) { // Check exist and no preivew-html div (created by us with no "class" attribute)
-            setTimeout(addPreview, 300, textarea);
+            setTimeout(addPreview, EDITTOOL_INIT_DELAY, textarea);
         }
     });
 
@@ -19,7 +21,7 @@ function previewRun () {
     });
 
     function delayAddPreview (evt: Event) {
-        setTimeout(addPreview, 300, evt.currentTarget);
+        setTimeout(addPreview, EDITTOOL_INIT_DELAY, evt.currentTarget);
         evt.currentTarget.removeEventListener("focus", delayAddPreview);
     }
 
@@ -58,6 +60,12 @@ function previewRun () {
                     div.style.display = "none";
                 }
             });
+
+            // 4. Response to submit event
+            textarea.closest("#ReplysForm, #ReplyForm").addEventListener("submit", () => {
+                textarea.style.display = "block";
+                div.style.display = "none";
+            })
         }
     }
 }
