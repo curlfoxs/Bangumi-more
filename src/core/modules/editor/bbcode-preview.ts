@@ -65,7 +65,7 @@ function previewRun () {
             textarea.closest("#ReplysForm, #ReplyForm").addEventListener("submit", () => {
                 textarea.style.display = "block";
                 div.style.display = "none";
-            })
+            });
         }
     }
 }
