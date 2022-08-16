@@ -17,6 +17,7 @@
     "build:js": "babel src --out-dir build/js --extensions \".ts,.tsx\" --source-maps inline",
     "prebundle": "npm run lint",
     "bundle": "webpack --mode production",
+    "bundle:watch": "webpack --mode production --watch",
     "dev": "npx webpack serve --mode development"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 import { transform, MarkLang } from "./outlined";
 
 function previewRun () {
-    const mkTextarea = document.querySelector("textarea[name='content']") as HTMLTextAreaElement;
+    const mkTextarea = document.querySelector("textarea") as HTMLTextAreaElement;
     if (mkTextarea) {
         mkTextarea.addEventListener("focus", delayAddPreview);
     }

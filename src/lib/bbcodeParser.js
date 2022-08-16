@@ -144,10 +144,10 @@ function BBCodeHTML() {
       }
       /**
        * Replace \n to <br>, fit for bangumi.tv
-       * Add <br><br> at the top
+       * Add <br><br><br><br> at the top
        */
       str = str.replace(RegExp('\\n', 'gi'), '<br>')
-      str = '<br><br>' + str;
+      str = '<br><br><br><br>' + str;
 
       /**
        * Fit [code] [/code] for bangumi.tv, reserve content in [code]
