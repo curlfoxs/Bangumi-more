@@ -6,7 +6,7 @@ function previewRun () {
         mkTextarea.addEventListener("focus", delayAddPreview);
     }
 
-    function addPreview() {
+    function addPreview () {
         const mkHeader = document.querySelector(".markItUpHeader") as HTMLElement;
         if (mkHeader && mkTextarea) {
             const s = document.createElement("li");
@@ -20,7 +20,7 @@ function previewRun () {
             s.textContent = "---------------";
             a.href = "";
             a.textContent = "预览";
-            a.setAttribute("title", "BBCode预览")
+            a.setAttribute("title", "BBCode预览");
             previewBtn.append(a);
             previewBtn.setAttribute("class", "markItUpButton markItUpButton16 preview");
             (mkHeader.firstChild as HTMLElement).append(s, previewBtn);
