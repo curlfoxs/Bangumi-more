@@ -12,7 +12,7 @@ function previewRun () {
         }
     });
 
-    const selectors = ["textarea#content", "textarea#comment", "textarea#newbio", "textarea#msg_body", "textarea#summary"];
+    const selectors = ["textarea#content", "textarea#tpc_content", "textarea#comment", "textarea#newbio", "textarea#msg_body", "textarea#summary"];
     selectors.forEach((s: string) => {
         const mkTextarea = document.querySelector(s) as HTMLTextAreaElement;
         if (mkTextarea) {
