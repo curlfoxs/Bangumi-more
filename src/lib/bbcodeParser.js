@@ -172,7 +172,7 @@ function BBCodeHTML() {
         for (let i=0; i<smileMatch.length; ++i) {
           let smileIdx = Number(smileMatch[i].slice(4, -1));
           if (smileIdx >= 10 && smileIdx <= 123) {
-            str = str.replace(smileMatch[i], s => `<img src="${smiles[s]}" alt"${s}">`);
+            str = str.replaceAll(smileMatch[i], s => `<img src="${smiles[s]}" alt="${s.slice(1,-1)}">`);
           }
         }
       }
